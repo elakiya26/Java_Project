@@ -1,0 +1,56 @@
+import java.io.File;
+import java.util.Scanner;
+
+public class fileExplorer {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter a directory path: ");
+        String path = scanner.nextLine();
+
+        File targetDir = new File(path);
+
+        if (targetDir.exists() && targetDir.isDirectory()) {
+            System.out.println("\nExploring files...");
+            long totalSize = calculateSizeAndPrint(targetDir, 0);
+            
+            // Convert bytes to Megabytes for readability
+            double sizeInMB = (double) totalSize / (1024 * 1024);
+            System.out.printf("\nTotal Directory Size: %.2f MB\n", sizeInMB);
+        } else {
+            System.out.println("Error: Invalid directory path.");
+        }
+        scanner.close();
+    }
+
+    /**
+     * Recursive method to print file hierarchy and calculate total size.
+     */
+    public static long calculateSizeAndPrint(File currentItem, int depth) {
+        // Visual indentation based on how deep the folder is
+        String indent = "  ".repeat(depth);
+        
+        // BASE CASE: It's a file
+        if (currentItem.isFile()) {
+            System.out.println(indent + "📄 " + currentItem.getName() + " (" + currentItem.length() + " bytes)");
+            return currentItem.length();
+        }
+
+        // RECURSIVE STEP: It's a directory
+        long folderTotalSize = 0;
+        System.out.println(indent + "📁 [" + currentItem.getName().toUpperCase() + "]");
+
+        File[] files = currentItem.listFiles();
+        
+        // Handle restricted or empty folders
+        if (files != null) {
+            for (File file : files) {
+                // Recursive call: Increase depth by 1 for inner items
+                folderTotalSize += calculateSizeAndPrint(file, depth + 1);
+            }
+        }
+        
+        return folderTotalSize;
+    }
+}
+
